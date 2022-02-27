@@ -1,7 +1,10 @@
-package loggerhead
+package main
 
 import (
 	"flag"
+	"github.com/gin-gonic/gin"
+	"loggerhead/loggerhead"
+	"net/http"
 )
 
 var (
@@ -13,4 +16,24 @@ var (
 
 func main() {
 	flag.Parse()
+
+	app := gin.Default()
+	app.LoadHTMLGlob("fe/*.html")
+
+	ssHandler := &loggerhead.SocketHandler{}
+	app.GET("/socket.io/", gin.WrapH(ssHandler))
+	app.POST("/socket.io/", gin.WrapH(ssHandler))
+
+	app.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "home.html", gin.H{})
+	})
+
+	go loggerhead.Watch(
+		*program,
+		*workDir,
+		*programArgs,
+		*stdout,
+	)
+
+	http.ListenAndServe(":5050", app)
 }

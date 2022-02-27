@@ -8,13 +8,13 @@ import (
 	socketio "github.com/googollee/go-socket.io"
 )
 
+var socketServer = CreateChatServer()
+
 type SocketHandler struct{}
 
 func (sh *SocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	socketServer.ServeHTTP(w, r)
 }
-
-
 
 // Event on websocket
 var (
@@ -22,8 +22,6 @@ var (
 	CloseChat = "closechat"
 	Message   = "message"
 )
-
-var socketServer = CreateChatServer()
 
 func CreateChatServer() *socketio.Server {
 	server := socketio.NewServer(nil)

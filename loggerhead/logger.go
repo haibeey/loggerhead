@@ -17,11 +17,13 @@ var (
 )
 
 func GetLogs(program, workDir, programArgs, stdout string) (int, *os.File) {
-	if err := os.Chdir(workDir); err != nil {
-		log.Fatal(err)
+	if len(workDir) > 0 {
+		if err := os.Chdir(workDir); err != nil {
+			log.Fatal(err)
+		}
 	}
 
-	if program == "" {
+	if program == "" || len(program) <= 0 {
 		log.Fatal("You must provide a program to run in this mode")
 	}
 	if programArgs == "" {
@@ -50,7 +52,12 @@ func GetLogs(program, workDir, programArgs, stdout string) (int, *os.File) {
 		argsList[i] = strings.TrimSpace(argsList[i])
 	}
 
-	cmd := exec.Command(program, argsList...)
+	var cmd *exec.Cmd
+	if len(argsList) <= 0 {
+		cmd = exec.Command(program)
+	} else {
+		cmd = exec.Command(program, argsList...)
+	}
 
 	if std != nil {
 		cmd.Stderr = std
